@@ -34,3 +34,15 @@ jobs:
           push: true
           platforms: linux/amd64,linux/arm64
           tags: ghcr.io/mohith1612/invoicely:latest
+      
+      - name: Deploy to VM
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script: |
+            cd /opt/invoice
+            docker compose pull
+            docker compose up -d
+
