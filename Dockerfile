@@ -1,28 +1,27 @@
-# ---- Base ----
-FROM node:20-alpine AS base
-WORKDIR /app
+# syntax=docker/dockerfile:1.7
 
-# ---- Dependencies ----
-FROM base AS deps
+# ---------- deps (build on native GitHub CPU, not ARM emulation) ----------
+FROM --platform=$BUILDPLATFORM node:20-alpine AS deps
+WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
 
-# ---- Build ----
-FROM base AS builder
+# ---------- builder ----------
+FROM --platform=$BUILDPLATFORM node:20-alpine AS builder
+WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN npm run build
 
-# ---- Runtime ----
-FROM node:20-alpine AS runner
+# ---------- runtime (actual ARM container for your Oracle VM) ----------
+FROM --platform=$TARGETPLATFORM node:20-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 
-COPY --from=builder /app/package.json ./
-COPY --from=builder /app/.next ./.next
+# copy minimal runtime from Next standalone output
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/public ./public
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/next.config.ts ./next.config.ts
 
 EXPOSE 3000
-CMD ["npm", "start"]
+CMD ["node", "server.js"]

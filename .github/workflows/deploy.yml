@@ -35,6 +35,9 @@ jobs:
           platforms: linux/arm64
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          build-args: |
+            BUILDPLATFORM=linux/amd64
+            TARGETPLATFORM=linux/arm64
           tags: |
             ghcr.io/mohith1612/invoicely:latest
             ghcr.io/mohith1612/invoicely:${{ github.sha }}
