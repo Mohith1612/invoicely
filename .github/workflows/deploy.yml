@@ -32,7 +32,9 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           push: true
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/arm64
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
           tags: |
             ghcr.io/mohith1612/invoicely:latest
             ghcr.io/mohith1612/invoicely:${{ github.sha }}
