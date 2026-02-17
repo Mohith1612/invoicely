@@ -33,7 +33,9 @@ jobs:
         with:
           push: true
           platforms: linux/amd64,linux/arm64
-          tags: ghcr.io/mohith1612/invoicely:latest
+          tags: |
+            ghcr.io/mohith1612/invoicely:latest
+            ghcr.io/mohith1612/invoicely:${{ github.sha }}
       
       - name: Deploy to VM
         uses: appleboy/ssh-action@v1.0.3
@@ -42,7 +44,10 @@ jobs:
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           script: |
+            export IMAGE_TAG=${{ github.sha }}
+            echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u Mohith1612 --password-stdin
             cd /opt/invoice
-            docker compose pull
-            docker compose up -d
+            docker compose pull web
+            docker compose up -d web
+            docker image prune -af --filter "until=72h"
 
