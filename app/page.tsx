@@ -17,7 +17,7 @@ export default function Home() {
             Under Development.
           </h1>
           <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            This app is under development. Please check back later.
+            This app is under development. Please check back later for updates and new features. We appreciate your patience and understanding as we work to improve the app.
           </p>
         </div>
         <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
